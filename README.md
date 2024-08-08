@@ -37,12 +37,12 @@ cd transaction-authorizer
 
 Install
 ```
-mvn clean install
+./mvnw clean install
 ```
 
 ### Run
 ```
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 ## 🔨 Tools
