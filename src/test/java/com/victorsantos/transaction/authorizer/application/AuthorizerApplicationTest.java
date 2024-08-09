@@ -1,4 +1,4 @@
-package com.victorsantos.transaction.authorizer;
+package com.victorsantos.transaction.authorizer.application;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
