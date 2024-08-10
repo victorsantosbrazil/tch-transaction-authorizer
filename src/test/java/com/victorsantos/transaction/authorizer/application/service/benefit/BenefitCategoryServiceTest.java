@@ -1,6 +1,6 @@
-package com.victorsantos.transaction.authorizer.application.service;
+package com.victorsantos.transaction.authorizer.application.service.benefit;
 
-import static com.victorsantos.transaction.authorizer.application.service.BenefitCategoryServiceImpl.mccToCategoryMap;
+import static com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryServiceImpl.mccToCategoryMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;

@@ -3,8 +3,8 @@ package com.victorsantos.transaction.authorizer.application.usecase.authorize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.victorsantos.transaction.authorizer.application.service.BalanceService;
-import com.victorsantos.transaction.authorizer.application.service.BenefitCategoryService;
+import com.victorsantos.transaction.authorizer.application.service.balance.BalanceService;
+import com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryService;
 import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.domain.entity.Balance;
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;

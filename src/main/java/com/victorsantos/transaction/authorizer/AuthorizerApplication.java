@@ -1,4 +1,4 @@
-package com.victorsantos.transaction.authorizer.application;
+package com.victorsantos.transaction.authorizer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

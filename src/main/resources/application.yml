@@ -1,3 +1,10 @@
 spring:
   application:
     name: transaction-authorizer
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_SCHEMA:balance}
+    username: ${DB_USERNAME:app_authorizer}
+    password: ${DB_PASSWORD:password1234@}
+  jpa:
+    hibernate:
+      ddl-auto: update

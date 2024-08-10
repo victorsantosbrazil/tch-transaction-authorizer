@@ -1,4 +1,4 @@
-package com.victorsantos.transaction.authorizer.application.service;
+package com.victorsantos.transaction.authorizer.application.service.balance;
 
 import com.victorsantos.transaction.authorizer.domain.entity.Balance;
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;

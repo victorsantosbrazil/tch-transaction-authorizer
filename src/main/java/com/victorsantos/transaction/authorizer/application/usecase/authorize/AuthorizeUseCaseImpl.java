@@ -1,7 +1,7 @@
 package com.victorsantos.transaction.authorizer.application.usecase.authorize;
 
-import com.victorsantos.transaction.authorizer.application.service.BalanceService;
-import com.victorsantos.transaction.authorizer.application.service.BenefitCategoryService;
+import com.victorsantos.transaction.authorizer.application.service.balance.BalanceService;
+import com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryService;
 import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
