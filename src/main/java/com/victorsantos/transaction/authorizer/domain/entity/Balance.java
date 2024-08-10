@@ -1,5 +1,8 @@
 package com.victorsantos.transaction.authorizer.domain.entity;
 
+import static com.victorsantos.transaction.authorizer.application.util.BigDecimalUtil.isGreaterThan;
+import static com.victorsantos.transaction.authorizer.application.util.BigDecimalUtil.isLowerThanZero;
+
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;
 import java.math.BigDecimal;
 import lombok.Builder;
@@ -16,17 +19,21 @@ public class Balance {
     private BigDecimal totalAmount;
 
     private boolean hasEnoughBalance(BigDecimal amount) {
-        return this.totalAmount.compareTo(amount) >= 0;
+        return isGreaterThan(this.totalAmount, amount);
     }
 
-    public boolean debit(BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+    public BigDecimal debit(BigDecimal amount) {
+        if (amount == null || isLowerThanZero(amount)) {
             throw new IllegalArgumentException("Amount cannot be null or negative");
         }
 
-        if (!hasEnoughBalance(amount)) return false;
+        if (!hasEnoughBalance(amount)) {
+            var remainingAmount = amount.subtract(this.totalAmount);
+            this.totalAmount = BigDecimal.ZERO;
+            return remainingAmount;
+        }
 
         this.totalAmount = this.totalAmount.subtract(amount);
-        return true;
+        return BigDecimal.ZERO;
     }
 }

@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,8 +41,8 @@ class AuthorizeUseCaseTest {
     private BenefitCategoryService benefitCategoryService;
 
     @Test
-    @DisplayName("Given a valid request, then authorize transaction and return response with 'approved' code")
-    void givenValidRequest_thenAuthorizeAndReturnResponseWithApprovedCode() {
+    @DisplayName("Given request with amount lower than balance, then return response with 'approved' code")
+    void givenRequestWithAmountLowerThanBalance_thenReturnResponseWithApprovedCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
@@ -76,10 +78,108 @@ class AuthorizeUseCaseTest {
         assertEquals(expectedResponse.getCode(), response.getCode());
     }
 
+    @ParameterizedTest
+    @EnumSource(
+            value = BenefitCategory.class,
+            names = {"FOOD", "MEAL"})
+    @DisplayName(
+            "Given request with amount exceeding not cash balance and cash balance can process remaining, then return response with 'approved' code")
+    void
+            givenRequestWithAmountExceedingNotCashBalanceAndCashBalanceCanProcessRemaining_thenReturnResponseWithApprovedCode(
+                    BenefitCategory category) {
+        var accountId = "123";
+
+        var request = AuthorizeUseCaseRequest.builder()
+                .account("123")
+                .totalAmount(BigDecimal.valueOf(1500))
+                .mcc("5811")
+                .merchant("PADARIA DO ZE SAO PAULO BR")
+                .build();
+
+        var foodBalance = Balance.builder()
+                .accountId(accountId)
+                .category(category)
+                .totalAmount(BigDecimal.valueOf(1000))
+                .build();
+
+        var cashBalance = Balance.builder()
+                .accountId(accountId)
+                .category(BenefitCategory.CASH)
+                .totalAmount(BigDecimal.valueOf(1000))
+                .build();
+
+        var noValidationError = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noValidationError);
+        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
+        when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.of(cashBalance));
+
+        var response = usecase.run(request);
+
+        var balanceSavedCaptor = ArgumentCaptor.forClass(Balance.class);
+        verify(balanceService, times(2)).save(balanceSavedCaptor.capture());
+
+        var balancesSaved = balanceSavedCaptor.getAllValues();
+        var cashBalanceSaved = balancesSaved.get(0);
+        var foodBalanceSaved = balancesSaved.get(1);
+
+        assertEquals(BigDecimal.valueOf(500), cashBalanceSaved.getTotalAmount());
+        assertEquals(BigDecimal.ZERO, foodBalanceSaved.getTotalAmount());
+
+        var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.APPROVED);
+        assertEquals(expectedResponse.getCode(), response.getCode());
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = BenefitCategory.class,
+            names = {"FOOD", "MEAL"})
+    @DisplayName(
+            "Given request for not cash balance and value exceeding both its balance and cash balance together, then return response with 'refused' code")
+    void
+            givenRequestForNotCashBalanceAndAmountExceedingItsBalanceAndCashBalanceTogether_thenReturnResponseWithRefusedCode(
+                    BenefitCategory category) {
+        var accountId = "123";
+
+        var request = AuthorizeUseCaseRequest.builder()
+                .account("123")
+                .totalAmount(BigDecimal.valueOf(2001))
+                .mcc("5811")
+                .merchant("PADARIA DO ZE SAO PAULO BR")
+                .build();
+
+        var foodBalance = Balance.builder()
+                .accountId(accountId)
+                .category(category)
+                .totalAmount(BigDecimal.valueOf(1000))
+                .build();
+
+        var cashBalance = Balance.builder()
+                .accountId(accountId)
+                .category(BenefitCategory.CASH)
+                .totalAmount(BigDecimal.valueOf(1000))
+                .build();
+
+        var noValidationError = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noValidationError);
+        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
+        when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.of(cashBalance));
+
+        var response = usecase.run(request);
+
+        verify(balanceService, never()).save(any());
+
+        var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.REFUSED);
+        assertEquals(expectedResponse.getCode(), response.getCode());
+    }
+
     @Test
     @DisplayName(
-            "Given request with total amount exceeding balance, then do not authorize transaction and return response with 'refused' code")
-    void givenRequestWithTotalAmountExceedingBalance_thenDoNotAuthorizeAndReturnResponseWithRefusedCode() {
+            "Given request for cash balance and amount exceeding its balance, then return response with 'refused' code")
+    void givenRequestForCashBalanceAndAmountExceedingBalance_thenReturnResponseWithRefusedCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
@@ -112,9 +212,8 @@ class AuthorizeUseCaseTest {
     }
 
     @Test
-    @DisplayName(
-            "Given request with invalid fields, then do not authorize transaction and return response with 'other' code")
-    void givenRequestWithInvalidFields_thenDoNotAuthorizeAndReturnResponseWithOtherCode() {
+    @DisplayName("Given request with invalid fields, then return response with 'other' code")
+    void givenRequestWithInvalidFields_thenReturnResponseWithOtherCode() {
         var request = AuthorizeUseCaseRequest.builder()
                 .account("")
                 .totalAmount(null)
@@ -139,9 +238,8 @@ class AuthorizeUseCaseTest {
     }
 
     @Test
-    @DisplayName(
-            "Given request for a non-existent balance, then do not authorize transaction and return response with 'other' code")
-    void givenRequestForNonExistentBalance_thenDoNotAuthorizeAndReturnResponseWithOtherCode() {
+    @DisplayName("Given request for a non-existent balance, then return response with 'other' code")
+    void givenRequestForNonExistentBalance_thenReturnResponseWithOtherCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
