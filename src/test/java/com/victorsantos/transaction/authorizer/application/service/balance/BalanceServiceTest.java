@@ -62,8 +62,8 @@ class BalanceServiceTest {
     }
 
     @Test
-    @DisplayName("Given not existent id, when find balance by id, then return optional empty")
-    void givenNotExistentId_whenFindBalanceById_thenReturnOptionalEmpty() {
+    @DisplayName("Given a non-existent id, when find balance by id, then return optional empty")
+    void givenNonExistentId_whenFindBalanceById_thenReturnOptionalEmpty() {
         var accountId = "1";
         var category = BenefitCategory.CASH;
 
@@ -76,7 +76,7 @@ class BalanceServiceTest {
     }
 
     @Test
-    @DisplayName("Given entity, when save, then save entity")
+    @DisplayName("Given an entity, when save, then save entity")
     void givenEntity_whenSave_thenSaveEntity() {
         var balance = Balance.builder()
                 .accountId("1")

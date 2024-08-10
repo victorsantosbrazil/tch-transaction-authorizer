@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 interface BalanceServiceMapper {
+
     Balance toEntity(BalanceModel model);
 
     BalanceModel toModel(Balance balance);

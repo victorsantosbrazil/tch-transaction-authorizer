@@ -1,8 +1,8 @@
 package com.victorsantos.transaction.authorizer.application.usecase.authorize;
 
+import com.victorsantos.transaction.authorizer.application.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.application.service.balance.BalanceService;
 import com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryService;
-import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

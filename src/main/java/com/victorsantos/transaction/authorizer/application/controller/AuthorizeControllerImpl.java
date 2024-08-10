@@ -1,9 +1,9 @@
 package com.victorsantos.transaction.authorizer.application.controller;
 
+import com.victorsantos.transaction.authorizer.application.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.application.usecase.authorize.AuthorizeUseCase;
 import com.victorsantos.transaction.authorizer.application.usecase.authorize.AuthorizeUseCaseRequest;
 import com.victorsantos.transaction.authorizer.application.usecase.authorize.AuthorizeUseCaseResponse;
-import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;

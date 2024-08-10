@@ -3,9 +3,9 @@ package com.victorsantos.transaction.authorizer.application.usecase.authorize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import com.victorsantos.transaction.authorizer.application.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.application.service.balance.BalanceService;
 import com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryService;
-import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.domain.entity.Balance;
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;
 import java.math.BigDecimal;
@@ -58,9 +58,9 @@ class AuthorizeUseCaseTest {
                 .totalAmount(BigDecimal.valueOf(1000))
                 .build();
 
-        var noErrorResult = new SimpleErrors(request);
+        var noValidationError = new SimpleErrors(request);
 
-        when(validator.validateObject(request)).thenReturn(noErrorResult);
+        when(validator.validateObject(request)).thenReturn(noValidationError);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
@@ -97,9 +97,9 @@ class AuthorizeUseCaseTest {
                 .totalAmount(BigDecimal.valueOf(1000))
                 .build();
 
-        var noErrorResult = new SimpleErrors(request);
+        var noValidationError = new SimpleErrors(request);
 
-        when(validator.validateObject(request)).thenReturn(noErrorResult);
+        when(validator.validateObject(request)).thenReturn(noValidationError);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
@@ -140,8 +140,8 @@ class AuthorizeUseCaseTest {
 
     @Test
     @DisplayName(
-            "Given request for not existent balance, then do not authorize transaction and return response with 'other' code")
-    void givenRequestForNotExistentBalance_thenDoNotAuthorizeAndReturnResponseWithOtherCode() {
+            "Given request for a non-existent balance, then do not authorize transaction and return response with 'other' code")
+    void givenRequestForNonExistentBalance_thenDoNotAuthorizeAndReturnResponseWithOtherCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
@@ -153,9 +153,9 @@ class AuthorizeUseCaseTest {
                 .merchant("PADARIA DO ZE SAO PAULO BR")
                 .build();
 
-        var noErrorResult = new SimpleErrors(request);
+        var noValidationError = new SimpleErrors(request);
 
-        when(validator.validateObject(request)).thenReturn(noErrorResult);
+        when(validator.validateObject(request)).thenReturn(noValidationError);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.empty());
 

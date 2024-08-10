@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 @EqualsAndHashCode
 public class Balance {
+
     private String accountId;
     private BenefitCategory category;
     private BigDecimal totalAmount;

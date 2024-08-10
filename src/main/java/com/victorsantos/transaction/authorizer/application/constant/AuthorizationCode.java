@@ -1,4 +1,4 @@
-package com.victorsantos.transaction.authorizer.domain.constant;
+package com.victorsantos.transaction.authorizer.application.constant;
 
 public class AuthorizationCode {
 

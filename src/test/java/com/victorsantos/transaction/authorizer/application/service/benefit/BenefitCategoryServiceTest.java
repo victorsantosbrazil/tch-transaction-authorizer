@@ -23,8 +23,8 @@ class BenefitCategoryServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideMccAndCategory")
-    @DisplayName("Given mcc, when findByMcc, then return category")
-    void givenMcc_whenFindByMcc_thenReturnBenefitCategory(String mcc, BenefitCategory expected) {
+    @DisplayName("Given known mcc, when findByMcc, then return category")
+    void givenKnownMcc_whenFindByMcc_thenReturnBenefitCategory(String mcc, BenefitCategory expected) {
         var response = benefitCategoryService.findByMcc(mcc);
         assertEquals(expected, response);
     }

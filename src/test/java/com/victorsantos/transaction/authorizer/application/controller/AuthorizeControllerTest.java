@@ -9,9 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.victorsantos.transaction.authorizer.application.constant.AuthorizationCode;
 import com.victorsantos.transaction.authorizer.application.usecase.authorize.AuthorizeUseCase;
 import com.victorsantos.transaction.authorizer.application.usecase.authorize.AuthorizeUseCaseResponse;
-import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ class AuthorizeControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    @DisplayName("Given a valid request, when call endpoint, then return authorization response")
+    @DisplayName("Given a request, when call endpoint, then return authorization response")
     void givenRequest_whenCallEndpoint_thenReturnAuthorizationResponse() throws Exception {
         var request = oneAuthorizeUseCaseRequest();
         var requestJson = objectMapper.writeValueAsString(request);
@@ -51,8 +51,8 @@ class AuthorizeControllerTest {
 
     @Test
     @DisplayName(
-            "Given a valid request, when call endpoint and exception occurred, then return authorization response with other code")
-    void givenRequest_whenCallEndpoint_andExceptionOccurred_thenReturnAuthorizationResponseWithOtherCode()
+            "Given a request, when call endpoint and exception thrown, then return authorization response with 'other' code")
+    void givenRequest_whenCallEndpoint_andExceptionThrown_thenReturnAuthorizationResponseWithOtherCode()
             throws Exception {
         var request = oneAuthorizeUseCaseRequest();
         var requestJson = objectMapper.writeValueAsString(request);
