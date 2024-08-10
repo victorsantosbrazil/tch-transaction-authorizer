@@ -3,11 +3,14 @@ package com.victorsantos.transaction.authorizer.application.usecase.authorize;
 import com.victorsantos.transaction.authorizer.application.service.balance.BalanceService;
 import com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryService;
 import com.victorsantos.transaction.authorizer.domain.constant.AuthorizationCode;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 class AuthorizeUseCaseImpl implements AuthorizeUseCase {
 
     private final BalanceService balanceService;
@@ -16,21 +19,36 @@ class AuthorizeUseCaseImpl implements AuthorizeUseCase {
 
     @Override
     public AuthorizeUseCaseResponse run(AuthorizeUseCaseRequest request) {
+        var transactionId = UUID.randomUUID().toString();
+
+        log.info("Authorizing transaction... Id: {}, Request: {}", transactionId, request);
         var category = benefitCategoryService.findByMcc(request.getMcc());
 
-        var optionalBalance = balanceService.findById(request.getAccountId(), category);
+        var optionalBalance = balanceService.findById(request.getAccount(), category);
 
         if (optionalBalance.isEmpty()) {
+            log.error(
+                    "Transaction failed. Cause: Balance not found for account {} and category {}. Id: {}",
+                    request.getAccount(),
+                    category,
+                    transactionId);
             return new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
         }
 
         var balance = optionalBalance.get();
         var wasDebited = balance.debit(request.getTotalAmount());
         if (!wasDebited) {
+            log.error(
+                    "Transaction failed. Cause: Insufficient balance for account {} and category {}. Id: {}",
+                    request.getAccount(),
+                    category,
+                    transactionId);
             return new AuthorizeUseCaseResponse(AuthorizationCode.REFUSED);
         }
 
         balanceService.save(balance);
+
+        log.info("Transaction authorized. Id: {}", transactionId);
         return new AuthorizeUseCaseResponse(AuthorizationCode.APPROVED);
     }
 }

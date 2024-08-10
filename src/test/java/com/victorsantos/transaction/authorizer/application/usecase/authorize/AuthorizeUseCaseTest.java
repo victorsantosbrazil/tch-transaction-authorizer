@@ -40,7 +40,7 @@ class AuthorizeUseCaseTest {
         var category = BenefitCategory.CASH;
 
         var request = AuthorizeUseCaseRequest.builder()
-                .accountId("123")
+                .account("123")
                 .totalAmount(BigDecimal.valueOf(100))
                 .mcc("5811")
                 .merchant("PADARIA DO ZE SAO PAULO BR")
@@ -76,7 +76,7 @@ class AuthorizeUseCaseTest {
         var category = BenefitCategory.CASH;
 
         var request = AuthorizeUseCaseRequest.builder()
-                .accountId("123")
+                .account("123")
                 .totalAmount(BigDecimal.valueOf(1000.01))
                 .mcc("5811")
                 .merchant("PADARIA DO ZE SAO PAULO BR")
@@ -108,7 +108,7 @@ class AuthorizeUseCaseTest {
         var category = BenefitCategory.CASH;
 
         var request = AuthorizeUseCaseRequest.builder()
-                .accountId("123")
+                .account("123")
                 .totalAmount(BigDecimal.valueOf(100))
                 .mcc("5811")
                 .merchant("PADARIA DO ZE SAO PAULO BR")

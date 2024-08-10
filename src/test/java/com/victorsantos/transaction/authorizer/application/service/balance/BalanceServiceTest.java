@@ -76,6 +76,7 @@ class BalanceServiceTest {
     }
 
     @Test
+    @DisplayName("Given entity, when save, then save entity")
     void givenEntity_whenSave_thenSaveEntity() {
         var balance = Balance.builder()
                 .accountId("1")
