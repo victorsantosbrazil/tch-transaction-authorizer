@@ -7,11 +7,14 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Validator;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 class AuthorizeUseCaseImpl implements AuthorizeUseCase {
+
+    private final Validator validator;
 
     private final BalanceService balanceService;
 
@@ -22,6 +25,16 @@ class AuthorizeUseCaseImpl implements AuthorizeUseCase {
         var transactionId = UUID.randomUUID().toString();
 
         log.info("Authorizing transaction... Id: {}, Request: {}", transactionId, request);
+
+        var validationResult = validator.validateObject(request);
+        if (validationResult.hasErrors()) {
+            log.error(
+                    "Transaction failed. Cause: Found one or more invalid fields in request. Id: {}, Errors: {}",
+                    transactionId,
+                    validationResult.getAllErrors());
+            return new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
+        }
+
         var category = benefitCategoryService.findByMcc(request.getMcc());
 
         var optionalBalance = balanceService.findById(request.getAccount(), category);

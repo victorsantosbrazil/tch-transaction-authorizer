@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.SimpleErrors;
+import org.springframework.validation.Validator;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AuthorizeUseCaseImpl.class})
@@ -25,6 +28,9 @@ class AuthorizeUseCaseTest {
 
     @Autowired
     private AuthorizeUseCase usecase;
+
+    @MockBean
+    private Validator validator;
 
     @MockBean
     private BalanceService balanceService;
@@ -52,6 +58,9 @@ class AuthorizeUseCaseTest {
                 .totalAmount(BigDecimal.valueOf(1000))
                 .build();
 
+        var noErrorResult = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noErrorResult);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
@@ -88,6 +97,9 @@ class AuthorizeUseCaseTest {
                 .totalAmount(BigDecimal.valueOf(1000))
                 .build();
 
+        var noErrorResult = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noErrorResult);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
@@ -96,6 +108,33 @@ class AuthorizeUseCaseTest {
         verify(balanceService, never()).save(any());
 
         var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.REFUSED);
+        assertEquals(expectedResponse.getCode(), response.getCode());
+    }
+
+    @Test
+    @DisplayName(
+            "Given request with invalid fields, then do not authorize transaction and return response with 'other' code")
+    void givenRequestWithInvalidFields_thenDoNotAuthorizeAndReturnResponseWithOtherCode() {
+        var request = AuthorizeUseCaseRequest.builder()
+                .account("")
+                .totalAmount(null)
+                .mcc("")
+                .merchant("")
+                .build();
+
+        var validationErrors = new SimpleErrors(request);
+        validationErrors
+                .getFieldErrors()
+                .add(new FieldError("AuthorizeUseCaseRequest", "account", "must not be blank"));
+
+        when(validator.validateObject(request)).thenReturn(validationErrors);
+
+        var response = usecase.run(request);
+
+        verify(benefitCategoryService, never()).findByMcc(any());
+        verify(balanceService, never()).save(any());
+
+        var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
         assertEquals(expectedResponse.getCode(), response.getCode());
     }
 
@@ -114,6 +153,9 @@ class AuthorizeUseCaseTest {
                 .merchant("PADARIA DO ZE SAO PAULO BR")
                 .build();
 
+        var noErrorResult = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noErrorResult);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.empty());
 

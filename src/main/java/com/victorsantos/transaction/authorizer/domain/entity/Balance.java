@@ -19,6 +19,10 @@ public class Balance {
     }
 
     public boolean debit(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Amount cannot be null or negative");
+        }
+
         if (!hasEnoughBalance(amount)) return false;
 
         this.totalAmount = this.totalAmount.subtract(amount);

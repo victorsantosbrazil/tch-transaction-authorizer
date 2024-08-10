@@ -2,6 +2,7 @@ package com.victorsantos.transaction.authorizer.application.service.benefit;
 
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,7 @@ class BenefitCategoryServiceImpl implements BenefitCategoryService {
 
     @Override
     public BenefitCategory findByMcc(String mcc) {
+        mcc = Objects.requireNonNullElse(mcc, "");
         return mccToCategoryMap.getOrDefault(mcc, BenefitCategory.CASH);
     }
 }
