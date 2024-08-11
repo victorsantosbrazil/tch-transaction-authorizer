@@ -136,9 +136,9 @@ class AuthorizeUseCaseTest {
             value = BenefitCategory.class,
             names = {"FOOD", "MEAL"})
     @DisplayName(
-            "Given request for not cash balance and value exceeding both its balance and cash balance together, then return response with 'refused' code")
+            "Given request to a not cash balance and value exceeding both its balance and cash balance together, then return response with 'refused' code")
     void
-            givenRequestForNotCashBalanceAndAmountExceedingItsBalanceAndCashBalanceTogether_thenReturnResponseWithRefusedCode(
+            givenRequestToNotCashBalanceAndAmountExceedingItsBalanceAndCashBalanceTogether_thenReturnResponseWithRefusedCode(
                     BenefitCategory category) {
         var accountId = "123";
 
@@ -178,8 +178,8 @@ class AuthorizeUseCaseTest {
 
     @Test
     @DisplayName(
-            "Given request for cash balance and amount exceeding its balance, then return response with 'refused' code")
-    void givenRequestForCashBalanceAndAmountExceedingBalance_thenReturnResponseWithRefusedCode() {
+            "Given request to cash balance and amount exceeding its balance, then return response with 'refused' code")
+    void givenRequestToCashBalanceAndAmountExceedingBalance_thenReturnResponseWithRefusedCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
@@ -238,8 +238,8 @@ class AuthorizeUseCaseTest {
     }
 
     @Test
-    @DisplayName("Given request for a non-existent balance, then return response with 'other' code")
-    void givenRequestForNonExistentBalance_thenReturnResponseWithOtherCode() {
+    @DisplayName("Given request to a non-existent balance, then return response with 'other' code")
+    void givenRequestToNonExistentBalance_thenReturnResponseWithOtherCode() {
         var accountId = "123";
 
         var category = BenefitCategory.CASH;
@@ -256,6 +256,45 @@ class AuthorizeUseCaseTest {
         when(validator.validateObject(request)).thenReturn(noValidationError);
         when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.empty());
+
+        var response = usecase.run(request);
+
+        verify(balanceService, never()).save(any());
+
+        var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
+        assertEquals(expectedResponse.getCode(), response.getCode());
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = BenefitCategory.class,
+            names = {"FOOD", "MEAL"})
+    @DisplayName(
+            "Given request to a not cash balance and amount exceeding its balance and cash balance not found, then return response with 'other' code")
+    void
+            givenRequestToNotCashBalanceAndAmountExceedsItsBalanceAndCashBalanceNotFound_thenReturnResponseWithApprovedCode(
+                    BenefitCategory category) {
+        var accountId = "123";
+
+        var request = AuthorizeUseCaseRequest.builder()
+                .account(accountId)
+                .totalAmount(BigDecimal.valueOf(1500))
+                .mcc("5811")
+                .merchant("PADARIA DO ZE SAO PAULO BR")
+                .build();
+
+        var foodBalance = Balance.builder()
+                .accountId(accountId)
+                .category(category)
+                .totalAmount(BigDecimal.valueOf(1000))
+                .build();
+
+        var noValidationError = new SimpleErrors(request);
+
+        when(validator.validateObject(request)).thenReturn(noValidationError);
+        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
+        when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.empty());
 
         var response = usecase.run(request);
 

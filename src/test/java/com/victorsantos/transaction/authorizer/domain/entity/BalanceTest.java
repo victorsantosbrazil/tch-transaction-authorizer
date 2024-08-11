@@ -39,8 +39,8 @@ class BalanceTest {
     }
 
     @Test
-    @DisplayName("Given a total amount exceeding balance when debit then do not debit and return remaining amount")
-    void givenTotalAmountExceedingBalance_whenDebit_thenDebitAndReturnTrue() {
+    @DisplayName("Given a total amount exceeding balance when debit then debit and return remaining amount")
+    void givenTotalAmountExceedingBalance_whenDebit_thenDebitAndReturnRemainingAmount() {
         var totalAmount = BigDecimal.valueOf(100);
         var debitAmount = BigDecimal.valueOf(150);
 
