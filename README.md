@@ -3,7 +3,7 @@ Transaction Authorizer
 </h1>
 
 <h4 align="center">
-🚧  Building...  🚧
+v1.0.0
 </h4>
 
 ## 📰 Description
@@ -49,4 +49,15 @@ Install
 
 The following tools were used to build this project:
 
-* [Spring 3+](https://spring.io/)
+## 🔨 Tools
+
+The following tools were used to build this project:
+
+* [Spring 3+](https://spring.io/) 
+* [Maven](https://maven.apache.org/) 
+* [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-maven) 
+* [JaCoCo](https://github.com/jacoco/jacoco)
+* [OWASP Dependency Check](https://jeremylong.github.io/DependencyCheck/dependency-check-maven/)
+* [PostgreSQL](https://www.postgresql.org/) 
+* [Flyway](https://www.red-gate.com/products/flyway/community/) 
+* [Docker](https://www.docker.com/)
