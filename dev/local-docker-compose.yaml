@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:14.7
+    environment:
+      POSTGRES_DB: balance
+      POSTGRES_USER: app_authorizer
+      POSTGRES_PASSWORD: password1234@
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
