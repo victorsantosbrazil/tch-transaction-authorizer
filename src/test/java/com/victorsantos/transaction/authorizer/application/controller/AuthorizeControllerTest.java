@@ -66,4 +66,18 @@ class AuthorizeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(responseJson));
     }
+
+    @Test
+    @DisplayName(
+            "Given a request with invalid json, when call endpoint and exception thrown, then return authorization response with 'other' code")
+    void givenRequestWithInvalidJson_whenCallEndpoint_andExceptionThrown_thenReturnAuthorizationResponseWithOtherCode()
+            throws Exception {
+
+        var response = new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
+        var responseJson = objectMapper.writeValueAsString(response);
+
+        mockMvc.perform(post(TRANSACTIONS_PATH).content(""))
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseJson));
+    }
 }
