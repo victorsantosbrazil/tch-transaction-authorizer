@@ -58,7 +58,7 @@ class AuthorizeUseCaseImpl implements AuthorizeUseCase {
 
     private void debit(AuthorizeUseCaseRequest request) {
         var accountId = request.getAccount();
-        var category = benefitCategoryService.findByMcc(request.getMcc());
+        var category = benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc());
 
         var balance = findBalance(accountId, category);
 

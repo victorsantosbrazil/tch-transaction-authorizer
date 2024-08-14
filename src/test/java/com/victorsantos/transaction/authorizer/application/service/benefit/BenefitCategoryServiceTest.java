@@ -1,16 +1,16 @@
 package com.victorsantos.transaction.authorizer.application.service.benefit;
 
-import static com.victorsantos.transaction.authorizer.application.service.benefit.BenefitCategoryServiceImpl.mccToCategoryMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;
-import java.util.stream.Stream;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -21,40 +21,52 @@ class BenefitCategoryServiceTest {
     @Autowired
     private BenefitCategoryService benefitCategoryService;
 
-    @ParameterizedTest
-    @MethodSource("provideMccAndCategory")
-    @DisplayName("Given known mcc, when findByMcc, then return category")
-    void givenKnownMcc_whenFindByMcc_thenReturnBenefitCategory(String mcc, BenefitCategory expected) {
-        var response = benefitCategoryService.findByMcc(mcc);
+    @SpyBean
+    private MccBenefitCategory mccBenefitCategory;
+
+    @SpyBean
+    private MerchantNameBenefitCategory merchantNameBenefitCategory;
+
+    @Test
+    @DisplayName("Given merchant name with category, when find, then return merchant name category")
+    void givenMerchantNameWithBenefitCategory_whenFind_thenReturnMerchantNameCategory() {
+        var merchantName = "IFood";
+
+        var expected = BenefitCategory.MEAL;
+
+        doReturn(Optional.of(expected)).when(merchantNameBenefitCategory).find(merchantName);
+
+        var response = benefitCategoryService.findByMerchantNameAndMcc(merchantName, "5411");
+
         assertEquals(expected, response);
     }
 
-    public static Stream<Arguments> provideMccAndCategory() {
-        return Stream.of(
-                Arguments.of("5411", BenefitCategory.FOOD),
-                Arguments.of("5412", BenefitCategory.FOOD),
-                Arguments.of("5811", BenefitCategory.MEAL),
-                Arguments.of("5812", BenefitCategory.MEAL));
+    @Test
+    @DisplayName("Given merchant name without category and mcc has category, when find, then return mcc category")
+    void givenMerchantNameWithoutCategoryAndMccHasCategory_thenReturnMccCategory() {
+        String merchantName = "XYZ Store";
+        var mcc = "5411";
+
+        var expected = BenefitCategory.FOOD;
+
+        doReturn(Optional.empty()).when(merchantNameBenefitCategory).find(merchantName);
+        doReturn(Optional.of(expected)).when(mccBenefitCategory).find(mcc);
+
+        var response = benefitCategoryService.findByMerchantNameAndMcc(merchantName, mcc);
+
+        assertEquals(expected, response);
     }
 
-    @ParameterizedTest
-    @MethodSource("provideUnknownMcc")
-    @DisplayName("Given unknown mcc, when findByMcc, then return cash category")
-    void givenUnknownMcc_whenFindByMcc_thenReturnCashBenefitCategory(String mcc) {
-        var response = benefitCategoryService.findByMcc(mcc);
+    @Test
+    @DisplayName("Given merchant name and mcc without category, when find, then return cash category")
+    void givenMerchantNameAndMccWithoutCategory_whenFind_thenReturnCashCategory() {
+        String merchantName = "XYZ Store";
+        String mcc = "9999";
+
+        doReturn(Optional.empty()).when(merchantNameBenefitCategory).find(any());
+        doReturn(Optional.empty()).when(mccBenefitCategory).find(any());
+
+        var response = benefitCategoryService.findByMerchantNameAndMcc(merchantName, mcc);
         assertEquals(BenefitCategory.CASH, response);
-    }
-
-    public static Stream<Arguments> provideUnknownMcc() {
-        int nTests = 8;
-        return Stream.generate(() -> Arguments.of(generateUnknownMcc())).limit(nTests);
-    }
-
-    public static String generateUnknownMcc() {
-        var mcc = String.valueOf((int) (Math.random() * 10000));
-        if (mccToCategoryMap.containsKey(mcc)) {
-            return generateUnknownMcc();
-        }
-        return mcc;
     }
 }

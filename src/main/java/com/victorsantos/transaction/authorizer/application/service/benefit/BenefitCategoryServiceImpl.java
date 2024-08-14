@@ -1,22 +1,26 @@
 package com.victorsantos.transaction.authorizer.application.service.benefit;
 
 import com.victorsantos.transaction.authorizer.domain.enums.BenefitCategory;
-import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 class BenefitCategoryServiceImpl implements BenefitCategoryService {
 
-    static final Map<String, BenefitCategory> mccToCategoryMap = Map.of(
-            "5411", BenefitCategory.FOOD,
-            "5412", BenefitCategory.FOOD,
-            "5811", BenefitCategory.MEAL,
-            "5812", BenefitCategory.MEAL);
+    private final MerchantNameBenefitCategory merchantNameBenefitCategory;
+
+    private final MccBenefitCategory mccBenefitCategory;
 
     @Override
-    public BenefitCategory findByMcc(String mcc) {
-        mcc = Objects.requireNonNullElse(mcc, "");
-        return mccToCategoryMap.getOrDefault(mcc, BenefitCategory.CASH);
+    public BenefitCategory findByMerchantNameAndMcc(String merchantName, String mcc) {
+        var nonNullMerchantName = Objects.requireNonNullElse(merchantName, "");
+        var optionalMerchantNameCategory = merchantNameBenefitCategory.find(nonNullMerchantName);
+        if (optionalMerchantNameCategory.isEmpty()) {
+            var nonNullMcc = Objects.requireNonNullElse(mcc, "");
+            return mccBenefitCategory.find(nonNullMcc).orElse(BenefitCategory.CASH);
+        }
+        return optionalMerchantNameCategory.get();
     }
 }

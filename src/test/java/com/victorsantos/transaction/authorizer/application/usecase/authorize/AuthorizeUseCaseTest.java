@@ -63,7 +63,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
         var response = usecase.run(request);
@@ -111,7 +112,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
         when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.of(cashBalance));
 
@@ -164,7 +166,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
         when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.of(cashBalance));
 
@@ -200,7 +203,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(balance));
 
         var response = usecase.run(request);
@@ -230,7 +234,7 @@ class AuthorizeUseCaseTest {
 
         var response = usecase.run(request);
 
-        verify(benefitCategoryService, never()).findByMcc(any());
+        verify(benefitCategoryService, never()).findByMerchantNameAndMcc(any(), any());
         verify(balanceService, never()).save(any());
 
         var expectedResponse = new AuthorizeUseCaseResponse(AuthorizationCode.OTHER);
@@ -254,7 +258,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.empty());
 
         var response = usecase.run(request);
@@ -292,7 +297,8 @@ class AuthorizeUseCaseTest {
         var noValidationError = new SimpleErrors(request);
 
         when(validator.validateObject(request)).thenReturn(noValidationError);
-        when(benefitCategoryService.findByMcc(request.getMcc())).thenReturn(category);
+        when(benefitCategoryService.findByMerchantNameAndMcc(request.getMerchant(), request.getMcc()))
+                .thenReturn(category);
         when(balanceService.findById(accountId, category)).thenReturn(Optional.of(foodBalance));
         when(balanceService.findById(accountId, BenefitCategory.CASH)).thenReturn(Optional.empty());
 
